@@ -1,0 +1,76 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-11-26 15:43:04.058218",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "platforms",
+  "integration_id",
+  "is_enabled",
+  "content",
+  "media",
+  "tags",
+  "max_limit"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "is_enabled",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Enabled"
+  },
+  {
+   "fieldname": "platforms",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Platforms",
+   "options": "X\nFacebook\nLinkedIn\nInstagram\nThreads\nYoutube",
+   "reqd": 1
+  },
+  {
+   "fieldname": "content",
+   "fieldtype": "Long Text",
+   "label": "Content",
+   "reqd": 1
+  },
+  {
+   "fieldname": "media",
+   "fieldtype": "Attach",
+   "label": "Media"
+  },
+  {
+   "fieldname": "tags",
+   "fieldtype": "Small Text",
+   "label": "Tags"
+  },
+  {
+   "fieldname": "max_limit",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Max Limit",
+   "read_only": 1
+  },
+  {
+   "fieldname": "integration_id",
+   "fieldtype": "Data",
+   "label": "Integration Id"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-12-01 12:05:06.390132",
+ "modified_by": "Administrator",
+ "module": "Postiz",
+ "name": "Social Media Platform",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

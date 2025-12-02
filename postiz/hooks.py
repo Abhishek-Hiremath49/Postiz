@@ -5,6 +5,9 @@ app_description = "Post scheduler application"
 app_email = "abhishekhiremath4949@gmail.com"
 app_license = "mit"
 
+# from . import api
+
+
 # Apps
 # ------------------
 
@@ -242,3 +245,17 @@ app_license = "mit"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+# override_whitelisted_methods = {
+#     "postiz.postiz.api.fast_api.call_fastapi": "postiz.postiz.postiz.api.fast_api.call_fastapi"
+# }
+
+# doc_events = {
+#     "Post Scheduler": {
+#         "after_insert": "postiz.postiz.doctype.post_scheduler.post_scheduler.call_fastapi",
+#         "on_update": "postiz.postiz.doctype.post_scheduler.post_scheduler.call_fastapi",
+#     }
+# }
+
+# api_methods = {"postiz.api.webhooks.post_status_update": {"methods": ["POST"]}}
+
+doctype_js = {"Social Media Platform": "public/js/social_media_platform.js"}
