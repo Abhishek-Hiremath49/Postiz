@@ -5,13 +5,15 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "platforms",
-  "integration_id",
   "is_enabled",
+  "accounts",
+  "title",
   "content",
   "media",
+  "type",
+  "made_for_kids",
   "tags",
-  "max_limit"
+  "thumbnail"
  ],
  "fields": [
   {
@@ -19,14 +21,7 @@
    "fieldname": "is_enabled",
    "fieldtype": "Check",
    "in_list_view": 1,
-   "label": "Is Enabled"
-  },
-  {
-   "fieldname": "platforms",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "label": "Platforms",
-   "options": "X\nFacebook\nLinkedIn\nInstagram\nThreads\nYoutube",
+   "label": "Is Enabled",
    "reqd": 1
   },
   {
@@ -41,28 +36,46 @@
    "label": "Media"
   },
   {
+   "fieldname": "accounts",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Account",
+   "options": "Social Media Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "\nPublic\nPrivate"
+  },
+  {
+   "fieldname": "made_for_kids",
+   "fieldtype": "Select",
+   "label": "Made for kids",
+   "options": "\nYes\nNo"
+  },
+  {
    "fieldname": "tags",
-   "fieldtype": "Small Text",
+   "fieldtype": "Data",
    "label": "Tags"
   },
   {
-   "fieldname": "max_limit",
-   "fieldtype": "Int",
-   "hidden": 1,
-   "label": "Max Limit",
-   "read_only": 1
+   "fieldname": "thumbnail",
+   "fieldtype": "Attach Image",
+   "label": "Thumbnail"
   },
   {
-   "fieldname": "integration_id",
+   "fieldname": "title",
    "fieldtype": "Data",
-   "label": "Integration Id"
+   "label": "Title"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-12-01 12:05:06.390132",
+ "modified": "2025-12-08 13:45:13.252461",
  "modified_by": "Administrator",
  "module": "Postiz",
  "name": "Social Media Platform",

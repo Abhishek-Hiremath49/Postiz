@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class SocialMedia(Document):
+class SocialMediaAccount(Document):
 	pass

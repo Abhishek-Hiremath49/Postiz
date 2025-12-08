@@ -12,7 +12,8 @@
   "scheduled_at",
   "section_break_mzzs",
   "platforms",
-  "external_post_id",
+  "youtube_video_id",
+  "youtube_url",
   "api_response",
   "error_message"
  ],
@@ -27,12 +28,6 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "Draft\nScheduling\nScheduled\nSchedule Failed\nPublished\nCancelled",
-   "read_only": 1
-  },
-  {
-   "fieldname": "external_post_id",
-   "fieldtype": "Data",
-   "label": "External Post ID",
    "read_only": 1
   },
   {
@@ -72,12 +67,24 @@
   {
    "fieldname": "section_break_mzzs",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "youtube_video_id",
+   "fieldtype": "Data",
+   "label": "YouTube Video ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "youtube_url",
+   "fieldtype": "Data",
+   "label": "YouTube URL",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-01 11:58:48.278686",
+ "modified": "2025-12-06 20:57:54.851860",
  "modified_by": "Administrator",
  "module": "Postiz",
  "name": "Social Media Post",

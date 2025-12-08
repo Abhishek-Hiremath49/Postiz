@@ -258,4 +258,12 @@ app_license = "mit"
 
 # api_methods = {"postiz.api.webhooks.post_status_update": {"methods": ["POST"]}}
 
-doctype_js = {"Social Media Platform": "public/js/social_media_platform.js"}
+# doctype_js = {"Social Media Platform": "public/js/social_media_platform.js"}
+
+# scheduler_events = {
+#     "cron": {"* * * * *": ["postiz.postiz.api.post_scheduler.execute_scheduled_posts"]}
+# }
+
+# hooks.py
+app_include_js = ["/assets/postiz/js/workspace.js"]  # We'll add JS here
+scheduler_events = {"all": ["postiz.api.post_scheduler.publish_scheduled_posts"]}

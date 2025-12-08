@@ -5,36 +5,26 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "api_key",
-  "api_timeout_seconds",
-  "retry_attempts"
+  "youtube_client_id",
+  "youtube_client_secret"
  ],
  "fields": [
   {
-   "fieldname": "api_key",
+   "fieldname": "youtube_client_id",
    "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "API Key",
-   "reqd": 1
+   "label": "YouTube Client ID"
   },
   {
-   "default": "30",
-   "fieldname": "api_timeout_seconds",
-   "fieldtype": "Int",
-   "label": "API Timeout (seconds)"
-  },
-  {
-   "default": "3",
-   "fieldname": "retry_attempts",
-   "fieldtype": "Int",
-   "label": "Retry Attempts"
+   "fieldname": "youtube_client_secret",
+   "fieldtype": "Data",
+   "label": "YouTube Client Secret"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-11-27 14:10:05.317696",
+ "modified": "2025-12-05 17:06:30.191762",
  "modified_by": "Administrator",
  "module": "Postiz",
  "name": "Social Media Settings",

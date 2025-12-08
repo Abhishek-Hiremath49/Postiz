@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestPostScheduler(FrappeTestCase):
+class TestSocialMediaAccount(FrappeTestCase):
 	pass

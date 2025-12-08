@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class UploadMedia(Document):
+class Channel(Document):
 	pass

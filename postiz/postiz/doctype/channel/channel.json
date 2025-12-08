@@ -1,0 +1,94 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-04 13:30:25.786907",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "channel_name",
+  "authorization_url",
+  "token_url",
+  "scopes",
+  "api_base_url",
+  "post_endpoint",
+  "supports_refresh",
+  "redirect_uris"
+ ],
+ "fields": [
+  {
+   "fieldname": "channel_name",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Channel Name",
+   "options": "\nX\nYouTube",
+   "reqd": 1
+  },
+  {
+   "fieldname": "authorization_url",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Authorization URL",
+   "reqd": 1
+  },
+  {
+   "fieldname": "token_url",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Token URL",
+   "reqd": 1
+  },
+  {
+   "fieldname": "scopes",
+   "fieldtype": "Small Text",
+   "label": "Scopes"
+  },
+  {
+   "fieldname": "api_base_url",
+   "fieldtype": "Data",
+   "label": "API Base URL"
+  },
+  {
+   "fieldname": "post_endpoint",
+   "fieldtype": "Data",
+   "label": "Post Endpoint"
+  },
+  {
+   "default": "0",
+   "fieldname": "supports_refresh",
+   "fieldtype": "Check",
+   "label": "Supports Token Refresh"
+  },
+  {
+   "fieldname": "redirect_uris",
+   "fieldtype": "Data",
+   "label": "Redirect URIS"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-08 10:07:50.013897",
+ "modified_by": "Administrator",
+ "module": "Postiz",
+ "name": "Channel",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
