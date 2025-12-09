@@ -249,45 +249,117 @@
 //     }
 // });
 
+// frappe.ui.form.on("Social Media Post", {
+//     refresh(frm) {
+
+//         // Add POST NOW button when post is Draft
+//         if (frm.doc.status === "Draft" && !frm.is_new()) {
+//             frm.add_custom_button("Post Now", function () {
+//                 frappe.confirm(
+//                     "Post this video to YouTube immediately?",
+//                     function () {
+//                         frappe.call({
+//                             method: "postiz.api.post_scheduler.post_now",
+//                             args: { post_id: frm.doc.name },
+//                             freeze: true,
+//                             freeze_message: "Uploading video to YouTube...",
+//                             callback(r) {
+//                                 if (r.message && r.message.success) {
+//                                     frappe.show_alert({
+//                                         message: "Video posted successfully!",
+//                                         indicator: "green"
+//                                     });
+//                                     frm.reload_doc();
+//                                 } else {
+//                                     frappe.show_alert({
+//                                         message: r.message?.error || "Upload failed",
+//                                         indicator: "red"
+//                                     });
+//                                 }
+//                             }
+//                         });
+//                     }
+//                 );
+//             }, "Primary").addClass("btn-primary");
+//         }
+
+//         // Show status nicely
+//         if (frm.doc.status === "Published") {
+//             frm.dashboard.set_headline_alert("Posted to YouTube", "alert-success");
+//         }
+//     }
+// });
+
 frappe.ui.form.on("Social Media Post", {
     refresh(frm) {
-        // Remove old Schedule button if exists
+        // Always remove old buttons first
+        // frm.remove_custom_button("Post Now");
         // frm.remove_custom_button("Schedule Post");
 
-        // Add POST NOW button when post is Draft
-        if (frm.doc.status === "Draft" && !frm.is_new()) {
-            frm.add_custom_button("Post Now", function () {
-                frappe.confirm(
-                    "Post this video to YouTube immediately?",
-                    function () {
-                        frappe.call({
-                            method: "postiz.api.post_scheduler.post_now",
-                            args: { post_id: frm.doc.name },
-                            freeze: true,
-                            freeze_message: "Uploading video to YouTube...",
-                            callback(r) {
-                                if (r.message && r.message.success) {
-                                    frappe.show_alert({
-                                        message: "Video posted successfully!",
-                                        indicator: "green"
-                                    });
-                                    frm.reload_doc();
-                                } else {
-                                    frappe.show_alert({
-                                        message: r.message?.error || "Upload failed",
-                                        indicator: "red"
-                                    });
-                                }
-                            }
-                        });
+        // Only show buttons when in Draft
+        if (frm.doc.status !== "Draft" || frm.is_new()) return;
+
+        // Always show "Post Now" button
+        frm.add_custom_button(__("Post Now"), function () {
+            frappe.confirm("Publish this post immediately?", () => {
+                frappe.call({
+                    method: "postiz.api.post_scheduler.post_now",
+                    args: { post_id: frm.doc.name },
+                    freeze: true,
+                    freeze_message: __("Uploading to YouTube..."),
+                    callback(r) {
+                        if (r.message && r.message.success) {
+                            frappe.show_alert({
+                                message: "Posted successfully!",
+                                indicator: "green"
+                            });
+                        } else {
+                            frappe.show_alert({
+                                message: r.message?.error || "Upload failed",
+                                indicator: "red"
+                            });
+                        }
+                        frm.reload_doc();
                     }
-                );
-            }, "Primary").addClass("btn-primary");
+                });
+            });
+        }, __("Actions")).addClass("btn-primary");
+
+        // Show "Schedule Post" only if scheduled_time is set
+        if (frm.doc.scheduled_time) {
+            frm.add_custom_button(__("Schedule Post"), function () {
+                const time = frappe.datetime.str_to_user(frm.doc.scheduled_time);
+                frappe.confirm(`Schedule this post for <b>${time}</b>?`, () => {
+                    frm.set_value("status", "Scheduled");
+                    frm.save("Submit").then(() => {
+                        frappe.show_alert({
+                            message: `Post scheduled for ${time}!`,
+                            indicator: "green"
+                        });
+                    });
+                });
+            }, __("Actions")).addClass("btn-success");
         }
 
-        // Show status nicely
-        if (frm.doc.status === "Published") {
-            frm.dashboard.set_headline_alert("Posted to YouTube", "alert-success");
+        // Visual indicator when already scheduled
+        if (frm.doc.status === "Scheduled") {
+            const time = frappe.datetime.str_to_user(frm.doc.scheduled_time);
+            frm.dashboard.set_headline_alert(
+                `Scheduled for: <b>${time}</b>`,
+                "blue"
+            );
         }
+
+        if (frm.doc.status === "Published" && frm.doc.youtube_url) {
+            frm.dashboard.set_headline_alert(
+                `Published! <a href="${frm.doc.youtube_url}" target="_blank">Watch on YouTube</a>`,
+                "green"
+            );
+        }
+    },
+
+    // Refresh buttons when user changes scheduled_time
+    scheduled_time(frm) {
+        frm.trigger("refresh");
     }
 });

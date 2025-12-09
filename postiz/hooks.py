@@ -265,5 +265,10 @@ app_license = "mit"
 # }
 
 # hooks.py
-app_include_js = ["/assets/postiz/js/workspace.js"]  # We'll add JS here
-scheduler_events = {"all": ["postiz.api.post_scheduler.publish_scheduled_posts"]}
+# app_include_js = ["/assets/postiz/js/workspace.js"]  # We'll add JS here
+scheduler_events = {"all": ["postiz.api.post_scheduler.publish_due_posts"]}
+# scheduler_events = {
+#     "cron": {
+#         "* * * * *": ["postiz.api.post_scheduler.publish_due_posts"]  # ← every minute
+#     }
+# }

@@ -192,7 +192,7 @@ class YouTubeProvider(BaseProvider):
             frappe.msgprint("Post skipped: Platform is not enabled.")
             return None
 
-        full_media_path = get_file_path(media_path)  # ← CORRECT WAY
+        full_media_path = media_path  # ← CORRECT WAY
 
         if not os.path.exists(full_media_path):
             raise Exception(f"Media file not found on disk: {full_media_path}")

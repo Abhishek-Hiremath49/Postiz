@@ -5,6 +5,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "amended_from",
   "title",
   "status",
   "column_break_mjfg",
@@ -79,12 +80,19 @@
    "fieldtype": "Data",
    "label": "YouTube URL",
    "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "options": "Social Media Post",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-06 20:57:54.851860",
+ "modified": "2025-12-08 15:55:17.520623",
  "modified_by": "Administrator",
  "module": "Postiz",
  "name": "Social Media Post",
