@@ -418,7 +418,6 @@
 
 # import frappe
 # from frappe.utils import now_datetime
-# from postiz.postiz.api.providers.x import XProvider
 # from datetime import datetime
 
 # def execute_scheduled_posts():
@@ -446,7 +445,6 @@
 #                 account = frappe.get_doc("Social Media Account", row.account)
 #                 channel = frappe.get_doc("Channel", account.channel)
 
-#                 provider = XProvider(account, channel)
 #                 res = provider.post(row.content, media=row.media)
 
 #                 # Save API response and external_post_id if available
@@ -542,7 +540,6 @@
 #                 if channel.channel_name == "YouTube":
 #                     provider = YouTubeProvider(account, channel)
 #                 else:
-#                     # Add other providers, e.g., provider = XProvider(account, channel)
 #                     continue  # Skip if no provider
 
 #                 res = provider.post(row.content, row.media)
@@ -574,10 +571,14 @@
 
 # postiz/postiz/api/post_scheduler.py
 
+
 import frappe
 import os
+from frappe.utils import now_datetime
 from frappe.utils.file_manager import get_file_path
-from postiz.api.providers.youtube import YouTubeProvider  # Your YouTube class
+
+from postiz.api.providers.youtube import YouTubeProvider
+from postiz.api.providers.facebook import FacebookProvider
 
 
 @frappe.whitelist()
@@ -592,118 +593,110 @@ def post_now(post_id):
             account = frappe.get_doc("Social Media Account", row.accounts)
             channel = frappe.get_doc("Channel", account.channel)
 
-            if channel.channel_name != "YouTube":
+            # ——— GET REAL FILE PATH SAFELY (public or private) ———
+            media_path = None
+            if row.media:
+                relative_path = get_file_path(row.media)
+                if relative_path:
+                    # Public files
+                    candidate = frappe.get_site_path(
+                        "public", relative_path.lstrip("/")
+                    )
+                    if os.path.exists(candidate):
+                        media_path = candidate
+                    else:
+                        # Private files
+                        candidate = frappe.get_site_path(
+                            "private", relative_path.lstrip("/")
+                        )
+                        if os.path.exists(candidate):
+                            media_path = candidate
+
+            # ——— SELECT PROVIDER ———
+            if channel.channel_name == "YouTube":
+                if not media_path or not os.path.exists(media_path):
+                    continue
+                provider = YouTubeProvider(account, channel)
+            elif channel.channel_name == "Facebook":
+                provider = FacebookProvider(account, channel)
+            else:
                 continue
 
-            full_server_path = get_file_path(row.media)
-
-            if not full_server_path or not os.path.exists(full_server_path):
-                return {"success": False, "error": "Media file not found on server"}
-
-            # Pass the content row + the REAL file path
-            provider = YouTubeProvider(account, channel)
-            response = provider.post(row, full_server_path)
-
-            # if not row.media:
-            #     return {"success": False, "error": "No video attached"}
-
-            # file_path = get_file_path(row.media)
-            # full_path = os.path.join(
-            #     get_files_path(is_private=0), file_path.lstrip("/files/")
-            # )
-
-            # file_path = "/home/abhishek/Postiz/frappe/sites/postiz.localhost.com/public/files/6981411-hd_1920_1080_25fps.mp4"
-            # if not file_path:
-            #     return {"success": False, "error": "No media attached"}
-
-            # full_path =   # ← CORRECT WAY
-
-            # if not os.path.exists(full_path):
-            #     frappe.log_error(f"File not found: {file_path} → {full_path}")
-            #     return {
-            #         "success": False,
-            #         "error": f"File not found on server: {file_path}",
-            #     }
-
-            # provider = YouTubeProvider(account, channel)
-            # response = provider.post(row, file_path)
+            # ——— POST ———
+            response = provider.post(row, media_path)
 
             if response and response.status_code in (200, 201):
                 result = response.json()
-                video_id = result.get("id")
-                video_url = f"https://youtu.be/{video_id}"
 
-                # UPDATE DOCUMENT — THIS WORKS 100% IN BACKGROUND
-                # post.youtube_video_id = video_id
-                # post.youtube_url = video_url
-                # post.status = "Published"
-                # post.api_response = frappe.as_json(result)
+                if channel.channel_name == "Facebook":
+                    fb_post_id = result.get("id") or result.get("post_id")
+                    fb_url = f"https://www.facebook.com/{fb_post_id}"
+                    frappe.db.set_value(
+                        "Social Media Post",
+                        post.name,
+                        {
+                            "status": "Published",
+                            "facebook_post_id": fb_post_id,
+                            "facebook_url": fb_url,
+                            "api_response": frappe.as_json(result),
+                            "error_message": None,
+                        },
+                    )
 
-                # post.flags.ignore_validate = True
-                # post.flags.ignore_mandatory = True
-                # post.flags.ignore_links = True
-
-                # post.save(ignore_permissions=True)
-
-                frappe.db.set_value(
-                    "Social Media Post",
-                    post.name,
-                    {
-                        "status": "Published",
-                        "youtube_video_id": video_id,
-                        "youtube_url": video_url,
-                        "api_response": frappe.as_json(result),
-                    },
-                )
+                elif channel.channel_name == "YouTube":
+                    video_id = result.get("id")
+                    video_url = f"https://youtu.be/{video_id}"
+                    frappe.db.set_value(
+                        "Social Media Post",
+                        post.name,
+                        {
+                            "status": "Published",
+                            "youtube_video_id": video_id,
+                            "youtube_url": video_url,
+                            "api_response": frappe.as_json(result),
+                            "error_message": None,
+                        },
+                    )
 
                 frappe.db.commit()
-                return {"success": True, "video_id": video_id, "video_url": video_url}
+                return {"success": True, "message": "Posted successfully!"}
 
             else:
-                error_msg = response.text if response else "Upload failed"
+                error_msg = response.text[:500] if response else "No response"
                 frappe.db.set_value(
                     "Social Media Post",
                     post.name,
                     {"status": "Failed", "error_message": error_msg},
                 )
                 frappe.db.commit()
-
                 return {"success": False, "error": error_msg}
 
-        return {"success": False, "error": "No YouTube account selected"}
+        return {"success": False, "error": "No enabled platform found"}
 
     except Exception as e:
-        frappe.log_error(frappe.get_traceback(), f"YouTube Post Failed: {post_id}")
-
+        frappe.log_error(
+            message=frappe.get_traceback(), title=f"Post Failed: {post_id}"
+        )
         frappe.db.set_value(
             "Social Media Post",
             post_id,
             {"status": "Failed", "error_message": str(e)[:500]},
         )
         frappe.db.commit()
-
         return {"success": False, "error": str(e)}
 
 
 def publish_due_posts():
-    """Background job: runs every minute, publishes posts whose scheduled_time <= now"""
-    now = frappe.utils.now_datetime()
-
-    # Find all posts that are "Scheduled" and time has come
+    now = now_datetime()
     posts = frappe.get_all(
         "Social Media Post",
-        filters={
-            "status": "Scheduled",
-            "scheduled_time": ["<=", now],
-            "docstatus": 1,  # submitted
-        },
+        filters={"status": "Scheduled", "scheduled_time": ["<=", now], "docstatus": 1},
         fields=["name"],
     )
 
     for p in posts:
         try:
-            result = frappe.call("postiz.api.post_scheduler.post_now", post_id=p.name)
-            # No need to do anything — post_now already updates via db.set_value
+            frappe.call("postiz.api.post_scheduler.post_now", post_id=p.name)
             frappe.db.commit()
         except:
             frappe.db.rollback()

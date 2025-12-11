@@ -16,7 +16,9 @@
   "youtube_video_id",
   "youtube_url",
   "api_response",
-  "error_message"
+  "error_message",
+  "facebook_post_id",
+  "facebook_url"
  ],
  "fields": [
   {
@@ -87,12 +89,24 @@
    "label": "Amended From",
    "options": "Social Media Post",
    "read_only": 1
+  },
+  {
+   "fieldname": "facebook_post_id",
+   "fieldtype": "Data",
+   "label": "Facebook Post ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "facebook_url",
+   "fieldtype": "Data",
+   "label": "Facebook URL",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-08 15:55:17.520623",
+ "modified": "2025-12-11 10:57:20.775415",
  "modified_by": "Administrator",
  "module": "Postiz",
  "name": "Social Media Post",

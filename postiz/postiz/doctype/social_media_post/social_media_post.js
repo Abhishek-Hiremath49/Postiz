@@ -290,11 +290,9 @@
 //     }
 // });
 
+
 frappe.ui.form.on("Social Media Post", {
     refresh(frm) {
-        // Always remove old buttons first
-        // frm.remove_custom_button("Post Now");
-        // frm.remove_custom_button("Schedule Post");
 
         // Only show buttons when in Draft
         if (frm.doc.status !== "Draft" || frm.is_new()) return;

@@ -6,7 +6,9 @@
  "engine": "InnoDB",
  "field_order": [
   "youtube_client_id",
-  "youtube_client_secret"
+  "youtube_client_secret",
+  "facebook_app_id",
+  "facebook_app_secret"
  ],
  "fields": [
   {
@@ -18,13 +20,23 @@
    "fieldname": "youtube_client_secret",
    "fieldtype": "Data",
    "label": "YouTube Client Secret"
+  },
+  {
+   "fieldname": "facebook_app_id",
+   "fieldtype": "Data",
+   "label": "Facebook App ID"
+  },
+  {
+   "fieldname": "facebook_app_secret",
+   "fieldtype": "Data",
+   "label": "Facebook App Secret"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-12-05 17:06:30.191762",
+ "modified": "2025-12-09 14:24:23.046050",
  "modified_by": "Administrator",
  "module": "Postiz",
  "name": "Social Media Settings",

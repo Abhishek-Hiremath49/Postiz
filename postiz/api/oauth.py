@@ -12,14 +12,18 @@ def start(channel):
     ch = frappe.get_doc("Channel", channel)
 
     redirect_uri = get_request_site_address() + "/api/method/postiz.api.oauth.callback"
-    state = "af12gst"  #hashlib.sha256(os.urandom(1024)).hexdigest()
+    state = "af12gst"  # hashlib.sha256(os.urandom(1024)).hexdigest()
     frappe.cache().set_value(f"oauth_state:{state}", channel, expires_in_sec=3000)
 
     # For YouTube, use global settings for client_id (not per channel)
     settings = frappe.get_single("Social Media Settings")
-    client_id = (
-        settings.youtube_client_id if channel == "YouTube" else ch.oauth_client_id
-    )
+    if ch.channel_name == "YouTube":
+        client_id = settings.youtube_client_id
+    elif ch.channel_name == "Facebook":
+        client_id = settings.facebook_app_id
+    else:
+        client_id = ch.oauth_client_id
+
     SCOPES = ch.scopes
     params = {
         "response_type": "code",
@@ -132,6 +136,9 @@ def callback(code=None, state=None):
         if ch.channel_name == "YouTube":
             client_id = settings.get("youtube_client_id")
             client_secret = settings.get("youtube_client_secret")
+        elif ch.channel_name == "Facebook":
+            client_id = settings.facebook_app_id
+            client_secret = settings.get("facebook_app_secret")
         else:
             client_id = ch.oauth_client_id
             client_secret = ch.oauth_client_secret
@@ -152,6 +159,7 @@ def callback(code=None, state=None):
             headers={"Accept": "application/json"},
             timeout=30,
         )
+
         token = r.json()
 
         if "error" in token:
@@ -162,20 +170,52 @@ def callback(code=None, state=None):
         access_token = token["access_token"]
         refresh_token = token.get("refresh_token", "")
 
-        userinfo = requests.get(
-            "https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true",
-            headers={"Authorization": f"Bearer {access_token}"},
-            timeout=30,
-        ).json()
+        if ch.channel_name == "YouTube":
+            userinfo = requests.get(
+                "https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true",
+                headers={"Authorization": f"Bearer {access_token}"},
+                timeout=30,
+            ).json()
+            if userinfo.get("error"):
+                frappe.throw(f"YouTube API Error: {userinfo['error']['message']}")
 
-        if userinfo.get("error"):
-            frappe.throw(f"YouTube API Error: {userinfo['error']['message']}")
+            title = userinfo["items"][0]["snippet"]["title"]
+            channel_id = userinfo["items"][0]["id"]
 
-        title = userinfo["items"][0]["snippet"]["title"]
-        channel_id = userinfo["items"][0]["id"]
+        elif ch.channel_name == "Facebook":
+            # Facebook: Exchange for long-lived user token
+            long_url = "https://graph.facebook.com/v24.0/oauth/access_token"
+            params = {
+                "grant_type": "fb_exchange_token",
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "fb_exchange_token": access_token,  # short-lived
+            }
+            r = requests.get(long_url, params=params)
+            long_token = r.json().get("access_token")
+            if not long_token:
+                frappe.throw(f"Facebook Long Token Error: {r.json().get('error')}")
+
+            # Fetch pages
+            pages_url = "https://graph.facebook.com/v24.0/me/accounts"
+            r = requests.get(pages_url, params={"access_token": long_token})
+            pages = r.json().get("data", [])
+            if not pages:
+                frappe.throw(
+                    "No Facebook Pages found for this user. Ensure permissions and Page access."
+                )
+
+            # Take the first Page (or customize to select)
+            page = pages[0]
+            title = page["name"]
+            channel_id = page["id"]
+            access_token = page["access_token"]  # Use Page Token for posting
+
+        else:
+            frappe.throw("Unsupported channel for OAuth callback")
 
         acct = frappe.new_doc("Social Media Account")
-        acct.api_response = userinfo
+        acct.api_response = userinfo if ch.channel_name == "YouTube" else r.json()
         acct.channel = ch.name
         acct.user_name = title
         acct.provider_user_id = channel_id
